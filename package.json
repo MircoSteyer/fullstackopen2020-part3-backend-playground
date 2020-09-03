@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "description": "What am I doing",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MircoSteyer/fullstackopen2020-part3.git"
+  },
+  "keywords": [
+    "backend",
+    "fullstackopen2020",
+    "part3"
+  ],
+  "author": "Mirco Steyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MircoSteyer/fullstackopen2020-part3/issues"
+  },
+  "homepage": "https://github.com/MircoSteyer/fullstackopen2020-part3#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

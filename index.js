@@ -29,6 +29,7 @@ const generateId = () => {
     : 0
     return maxId + 1
 }
+app.use(express.static("build"))
 
 app.use(cors())
 

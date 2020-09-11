@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const app = express()
+const Note = require("./models/note")
 
 let notes = [
     {
@@ -25,8 +26,8 @@ let notes = [
 
 const generateId = () => {
     const maxId = notes.length > 0
-    ? Math.max(...notes.map(note => note.id))
-    : 0
+        ? Math.max(...notes.map(note => note.id))
+        : 0
     return maxId + 1
 }
 app.use(express.static("build"))
@@ -40,7 +41,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/api/notes", (req, res) => {
-    res.json(notes)
+    Note.find({}).then(response => res.json(response))
 })
 
 app.get("/api/notes/:id", (req, res) => {

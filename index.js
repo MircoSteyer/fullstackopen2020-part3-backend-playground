@@ -1,9 +1,10 @@
+require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const app = express()
 const Note = require("./models/note")
 
-let notes = [
+/*let notes = [
     {
         id: 1,
         content: "HTML is easy",
@@ -22,39 +23,46 @@ let notes = [
         date: "2019-05-30T19:20:14.298Z",
         important: true
     }
-]
+]*/
 
-const generateId = () => {
+/*const generateId = () => {
     const maxId = notes.length > 0
         ? Math.max(...notes.map(note => note.id))
         : 0
     return maxId + 1
-}
+}*/
+
 app.use(express.static("build"))
 
 app.use(cors())
 
 app.use(express.json())
 
-app.get("/", (req, res) => {
-    res.send(`<h1>Hello World</h1>`)
-})
-
 app.get("/api/notes", (req, res) => {
     Note.find({}).then(response => res.json(response))
 })
 
-app.get("/api/notes/:id", (req, res) => {
-    const id = Number(req.params.id)
-    const note = notes.find(note => note.id === id)
-
-    note ? res.json(note) : res.status(404).end()
+app.get("/api/notes/:id", (req, res, next) => {
+    Note.findById(req.params.id)
+        .then(note => {
+            if (note) {
+                res.json(note)
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.delete("/api/notes/:id", (req, res) => {
-    const id = Number(req.params.id)
+
+    Note.findByIdAndDelete(req.params.id)
+        .then(result => res.status(204).end())
+        .catch(error => next(error))
+
+/*    const id = Number(req.params.id)
     notes = notes.filter(note => note.id !== id)
-    res.status(204).end()
+    res.status(204).end()*/
 })
 
 app.post("/api/notes", (req, res) => {
@@ -64,26 +72,45 @@ app.post("/api/notes", (req, res) => {
         return res.status(400).json({error: "No content given."})
     }
 
-    const note = {
+    const note = new Note({
         content: body.content,
         important: body.important || false,
         date: new Date(),
-        id: generateId()
-    }
-    notes = notes.concat(note)
-    res.json(note)
+    })
+    note.save().then((response) => {
+        res.json(response)})
+/*        .catch(error => error.status(400).json({error: "An error occurred."}))*/
 })
 
 app.put("/api/notes/:id", (req,res) => {
-    console.log("body", req.body)
-    const id = Number(req.params.id)
-    const newNote = req.body
-    notes = notes.map(note => note.id === id ? newNote : note)
-    console.log("notes", notes)
-    res.status(200).json(newNote)
+    const body = req.body
+
+    const newNote = {
+        content: body.content,
+        important: body.important,
+    }
+
+    Note.findByIdAndUpdate(req.params.id, newNote, {new: true, useFindAndModify: false})
+        .then(note => {
+        res.json(note)})
+        .catch(error => next(error))
 })
 
-const PORT = process.env.PORT || 3001
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({error: "unknown endpoint"})
+}
+app.use(unknownEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message)
+    if (error.name === "CastError") {
+        return res.status(404).send({error: "malformatted id"})
+    }
+    next(error)
+}
+app.use(errorHandler)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
 })

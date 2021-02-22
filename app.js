@@ -17,7 +17,7 @@ mongoose.connect(config.MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology:
     .catch(error => {logger.error("Error: ", error)})
 
 
-app.use(express.static("build"))
+/*app.use(express.static("build"))*/
 app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)

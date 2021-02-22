@@ -39,17 +39,18 @@ notesRouter.post("/", async (req, res) => {
     const body = req.body
     const token = getWebToken(req)
     const decodedToken = decodeToken(token)
+    console.log("decodedToken", decodedToken)
     if (!token || !decodedToken.id) {
         return res.status(401).json({error: "token missing or invalid"})
     }
 
-    const user = await User.findById(body.user)
+    const user = await User.findById(decodedToken.id)
 
     const newNote = new Note({
         content: body.content,
         important: body.important || false,
         date: new Date(),
-        user: body.user
+        user: user._id
     })
 
     const savedNote = await newNote.save()
